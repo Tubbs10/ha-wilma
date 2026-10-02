@@ -76,7 +76,7 @@ the child device.
 | Arvosanat | Unread grades (`ExamSeen`) |
 | Tiedote | School news |
 | Kurssit | Overview `Groups` (code + name + teacher) |
-| Uudet viestit | Per-child inbox after role switch |
+| Uudet viestit | Per-child inbox after role switch. Attribute `messages` lists the newest messages with their `id` |
 | Poissaolot | Absence notes |
 | Myöhästymiset | Late notes |
 | Kehut | Positive notes |
@@ -90,6 +90,23 @@ returned JSON vs HTML. Use those when a section stays empty.
 `403` on `exams` / `groups` / `choices` / `news/list` is often a **permission
 miss**, not a dead session. A dead session is `LOGIN_COLLISION`, an overview
 `401`/`403`, or overview `200 text/html` (login page).
+
+## Message bodies
+
+The sensors only carry subject, sender and time. The action `wilma.get_message`
+fetches one message body on demand and returns it as plain text:
+
+```yaml
+action: wilma.get_message
+data:
+  entity_id: sensor.aino_esimerkki_uudet_viestit   # any entity of the child, or device_id
+  message_id: 1234567                              # from the `messages` attribute
+response_variable: message
+```
+
+The response has `id`, `subject`, `sender`, `timestamp`, `content` and `replies`.
+Wilma marks a message as read when its body is fetched, so bodies are never
+polled in the background.
 
 ## Homework rules (1.2.6–1.2.7)
 

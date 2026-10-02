@@ -26,5 +26,25 @@
     "abort": {
       "already_configured": "Tämä lapsi on jo lisätty"
     }
+  },
+  "services": {
+    "get_message": {
+      "name": "Hae viesti",
+      "description": "Hakee yhden Wilma-viestin sisällön tekstinä. Wilma merkitsee viestin luetuksi.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteetti",
+          "description": "Mikä tahansa lapsen Wilma-entiteetti."
+        },
+        "device_id": {
+          "name": "Laite",
+          "description": "Lapsen Wilma-laite entiteetin sijaan."
+        },
+        "message_id": {
+          "name": "Viestin tunniste",
+          "description": "Tunniste Uudet viestit -sensorin messages-attribuutista."
+        }
+      }
+    }
   }
 }

@@ -27,7 +27,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
-from .messages import fetch_messages_html, fetch_messages_json, fetch_unread_ids
+from .messages import fetch_message, fetch_messages_html, fetch_messages_json, fetch_unread_ids
 from .models import SchoolData
 from .roles import _is_named_child, _norm_id, switch_child
 
@@ -106,6 +106,7 @@ class WilmaCoordinator(DataUpdateCoordinator[WilmaData]):
         self.client: WilmaClient | None = None
         self._logged_in = False
         self._known_unread_ids: set[int] = set()
+        self._message_cache: dict[tuple[str, int], dict] = {}
 
     async def async_setup(self) -> None:
         self._session = aiohttp.ClientSession(headers=BROWSER_HEADERS)
@@ -222,6 +223,29 @@ class WilmaCoordinator(DataUpdateCoordinator[WilmaData]):
                 _LOGGER.debug("Wilma HTML messages failed for %s: %s", child_id, err)
 
         return messages
+
+    async def async_get_message(self, child_id: str, message_id: int) -> dict:
+        """One message with its body, fetched on demand.
+
+        Wilma marks a message as read when its body is fetched, so bodies are
+        never polled: only a `wilma.get_message` call ends up here. Bodies are
+        cached until the integration reloads.
+
+        The session is left to the regular poll: a failed fetch never logs in
+        again, because a second login on a live session is refused by Wilma.
+        """
+        key = (child_id, int(message_id))
+        if key in self._message_cache:
+            return self._message_cache[key]
+        if self._session is None or not self._logged_in:
+            raise WilmaError("Wilma session is not ready, try again after the next update")
+        base = self.entry.data[CONF_URL]
+        uid = _norm_id(child_id) or self._child_uid()
+        async with _account_lock(self.hass, account_key(self.entry)):
+            await switch_child(self._session, base, uid)
+            message = await fetch_message(self._session, base, uid, message_id)
+        self._message_cache[key] = message
+        return message
 
     async def _load_child_school(self, child_id: str, child_name: str) -> SchoolData | None:
         """Fetch one child's school pages. Relogin + retry on collision / dead session.
