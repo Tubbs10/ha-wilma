@@ -393,13 +393,16 @@ def _dedupe_notes(notes: list[LessonNote]) -> list[LessonNote]:
 
 
 def _dedupe_lessons(lessons: list[Lesson]) -> list[Lesson]:
-    seen: set[tuple[int, str, str, str]] = set()
+    seen: dict[tuple[int, str, str, str], Lesson] = {}
     out: list[Lesson] = []
     for lesson in lessons:
         key = (lesson.day, lesson.start, lesson.end, lesson.subject)
-        if key in seen:
+        kept = seen.get(key)
+        if kept:
+            # The same slot can come once per period: keep every date it is held on.
+            kept.dates.extend(item for item in lesson.dates if item not in kept.dates)
             continue
-        seen.add(key)
+        seen[key] = lesson
         out.append(lesson)
     out.sort(key=lambda item: (item.day, item.start or ""))
     return out

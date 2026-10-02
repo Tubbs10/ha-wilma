@@ -430,6 +430,8 @@ class TodaySensor(Base):
 class NextLessonSensor(Base):
     _attr_name = "Seuraava tunti"
     _attr_icon = "mdi:calendar-clock"
+    # The dated list is for dashboards; the recorder keeps lesson_1…lesson_40.
+    _unrecorded_attributes = frozenset({"schedule"})
 
     def __init__(self, coordinator, entry, child_id=None, child_name=None):
         super().__init__(coordinator, entry, "next_lesson", child_id, child_name)
@@ -461,6 +463,21 @@ class NextLessonSensor(Base):
                 lesson.teacher,
                 lesson.room,
             )
+        # The same lessons with the dates they are held on. A timetable that
+        # changes between periods has two lessons in one weekly slot; the
+        # dates tell which one is on a given day.
+        attrs["schedule"] = [
+            {
+                "day": lesson.day,
+                "start": lesson.start,
+                "end": lesson.end,
+                "subject": lesson.subject,
+                "teacher": lesson.teacher,
+                "room": lesson.room,
+                "dates": sorted({d.isoformat() for d in map(parse_date, lesson.dates) if d}),
+            }
+            for lesson in ordered
+        ]
         return attrs
 
 
