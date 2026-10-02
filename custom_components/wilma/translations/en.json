@@ -45,6 +45,42 @@
           "description": "The id from the messages attribute of the Uudet viestit sensor."
         }
       }
+    },
+    "pin_message": {
+      "name": "Pin message",
+      "description": "Pins a message to the pinned attribute of the child's Uudet viestit sensor. The pin is shared by all users.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity",
+          "description": "Any Wilma entity of the child."
+        },
+        "device_id": {
+          "name": "Device",
+          "description": "The child's Wilma device instead of an entity."
+        },
+        "message_id": {
+          "name": "Message id",
+          "description": "The id from the messages attribute of the Uudet viestit sensor."
+        }
+      }
+    },
+    "unpin_message": {
+      "name": "Unpin message",
+      "description": "Removes the pin from a message.",
+      "fields": {
+        "entity_id": {
+          "name": "Entity",
+          "description": "Any Wilma entity of the child."
+        },
+        "device_id": {
+          "name": "Device",
+          "description": "The child's Wilma device instead of an entity."
+        },
+        "message_id": {
+          "name": "Message id",
+          "description": "The id from the messages attribute of the Uudet viestit sensor."
+        }
+      }
     }
   }
 }

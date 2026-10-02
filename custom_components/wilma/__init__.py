@@ -23,6 +23,8 @@ from .messages import MessageNotFound
 PLATFORMS = [Platform.SENSOR, Platform.CALENDAR]
 
 SERVICE_GET_MESSAGE = "get_message"
+SERVICE_PIN_MESSAGE = "pin_message"
+SERVICE_UNPIN_MESSAGE = "unpin_message"
 GET_MESSAGE_SCHEMA = vol.Schema(
     {
         vol.Optional("entity_id"): cv.entity_id,
@@ -70,6 +72,20 @@ def _register_services(hass: HomeAssistant) -> None:
         supports_response=SupportsResponse.ONLY,
     )
 
+    async def pin_message(call: ServiceCall) -> None:
+        coordinator, child_id = _child_from_call(hass, call)
+        try:
+            await coordinator.async_pin_message(child_id, call.data["message_id"])
+        except ValueError as err:
+            raise ServiceValidationError(f"Cannot pin: {err}") from err
+
+    async def unpin_message(call: ServiceCall) -> None:
+        coordinator, child_id = _child_from_call(hass, call)
+        await coordinator.async_unpin_message(child_id, call.data["message_id"])
+
+    hass.services.async_register(DOMAIN, SERVICE_PIN_MESSAGE, pin_message, schema=GET_MESSAGE_SCHEMA)
+    hass.services.async_register(DOMAIN, SERVICE_UNPIN_MESSAGE, unpin_message, schema=GET_MESSAGE_SCHEMA)
+
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = WilmaCoordinator(hass, entry)
@@ -95,5 +111,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if coordinator:
         await coordinator.async_shutdown()
     if not any(isinstance(item, WilmaCoordinator) for item in hass.data[DOMAIN].values()):
-        hass.services.async_remove(DOMAIN, SERVICE_GET_MESSAGE)
+        for service in (SERVICE_GET_MESSAGE, SERVICE_PIN_MESSAGE, SERVICE_UNPIN_MESSAGE):
+            hass.services.async_remove(DOMAIN, service)
     return unload_ok

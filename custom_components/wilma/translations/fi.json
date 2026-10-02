@@ -45,6 +45,42 @@
           "description": "Tunniste Uudet viestit -sensorin messages-attribuutista."
         }
       }
+    },
+    "pin_message": {
+      "name": "Kiinnitä viesti",
+      "description": "Kiinnittää viestin lapsen Uudet viestit -sensorin pinned-attribuuttiin. Kiinnitys näkyy kaikille käyttäjille.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteetti",
+          "description": "Mikä tahansa lapsen Wilma-entiteetti."
+        },
+        "device_id": {
+          "name": "Laite",
+          "description": "Lapsen Wilma-laite entiteetin sijaan."
+        },
+        "message_id": {
+          "name": "Viestin tunniste",
+          "description": "Tunniste Uudet viestit -sensorin messages-attribuutista."
+        }
+      }
+    },
+    "unpin_message": {
+      "name": "Poista viestin kiinnitys",
+      "description": "Poistaa viestin kiinnityksen.",
+      "fields": {
+        "entity_id": {
+          "name": "Entiteetti",
+          "description": "Mikä tahansa lapsen Wilma-entiteetti."
+        },
+        "device_id": {
+          "name": "Laite",
+          "description": "Lapsen Wilma-laite entiteetin sijaan."
+        },
+        "message_id": {
+          "name": "Viestin tunniste",
+          "description": "Tunniste Uudet viestit -sensorin messages-attribuutista."
+        }
+      }
     }
   }
 }
