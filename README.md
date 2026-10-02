@@ -2,7 +2,12 @@
 
 Unofficial Home Assistant integration for [Visma Wilma](https://www.wilma.fi/).
 
-Current version: **1.2.7**.
+This is a fork of [mniittymaki/ha-wilma](https://github.com/mniittymaki/ha-wilma),
+maintained separately. On top of 1.2.10 it adds message bodies, pinned messages,
+dated lesson notes and praise details. The
+[Wilma card](https://github.com/Tubbs10/ha-wilma-card) needs this fork.
+
+Current version: **1.2.11**.
 
 It logs in with a **guardian** username and password, keeps one browser-like
 session, and polls school pages. There is no Visma developer API key.
@@ -21,7 +26,7 @@ Confirmed working:
 Other `*.inschool.fi` tenants use the same flow. Some schools need strong
 identification (Suomi.fi / MFA) — this integration only supports Wilma
 username + password. Hollola (`hollola.inschool.fi`) is a known login miss
-([issue #6](https://github.com/mniittymaki/ha-wilma/issues/6)).
+([upstream issue #6](https://github.com/mniittymaki/ha-wilma/issues/6)).
 
 > Not affiliated with Visma or Wilma. Endpoints outside `/messages` are
 > unofficial and can change when Wilma updates.
@@ -108,6 +113,14 @@ The response has `id`, `subject`, `sender`, `timestamp`, `content` and `replies`
 Wilma marks a message as read when its body is fetched, so bodies are never
 polled in the background.
 
+`wilma.pin_message` and `wilma.unpin_message` take the same `entity_id` (or
+`device_id`) and `message_id`. Pinned messages are stored per child and listed
+in the `pinned` attribute of the **Uudet viestit** sensor with id, subject,
+sender and timestamp, so every user of a dashboard sees the same pins.
+
+The **Kehut** sensor has a `notes` attribute with `date`, `kind`, `subject`,
+`teacher` and `text` of each positive note.
+
 ## Homework rules (1.2.6–1.2.7)
 
 Wilma homework uses long names (`Englanti, A1`, `Suomen kieli ja kirjallisuus`,
@@ -168,8 +181,10 @@ fallback. `msg_*` includes the send timestamp.
 
 ### HACS
 
-Add [mniittymaki/ha-wilma](https://github.com/mniittymaki/ha-wilma) as a custom
-repository (Integration), install **Wilma**, restart.
+Add [Tubbs10/ha-wilma](https://github.com/Tubbs10/ha-wilma) as a custom
+repository (Integration), install **Wilma**, restart. If the original
+integration is installed from HACS, remove that repository from HACS first;
+the configured Wilma account and its entities stay.
 
 Minimum Home Assistant: **2024.1.0**.
 
@@ -201,6 +216,8 @@ Works on Container/Docker HA. No Supervisor add-on store required.
 
 | Version | Notes |
 |---|---|
+| 1.2.11 | Fork. `wilma.get_message`, `wilma.pin_message` / `wilma.unpin_message`, `messages` and `pinned` attributes, lesson notes read from the attendance table rows (dated notes, by Mihail Tommonen), `notes` attribute on Kehut |
+| 1.2.10 | Moitteet sensor |
 | 1.2.7 | Homework due = next subject lesson **after** the assigned date |
 | 1.2.6 | Code↔name matching (`Englanti, A1` ↔ `ENA1`), `hw_*` hints, calendar `time`/`date` crash fixes |
 | 1.2.5 | Do not crash on auto-messages without `sender_id` |
