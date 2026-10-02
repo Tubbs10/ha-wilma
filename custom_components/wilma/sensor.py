@@ -307,6 +307,8 @@ class PositiveSensor(Base):
     _attr_icon = "mdi:thumb-up"
     _attr_native_unit_of_measurement = "kpl"
     _attr_state_class = SensorStateClass.MEASUREMENT
+    # The list is for dashboards; the recorder keeps item_1…item_10.
+    _unrecorded_attributes = frozenset({"notes"})
 
     def __init__(self, coordinator, entry, child_id=None, child_name=None):
         super().__init__(coordinator, entry, "positives", child_id, child_name)
@@ -319,10 +321,22 @@ class PositiveSensor(Base):
     def extra_state_attributes(self) -> dict:
         if not self.school:
             return {}
-        return {
+        attrs: dict = {
             f"item_{i}": _join(n.date, n.kind, n.subject, n.text)
             for i, n in enumerate(self.school.positives[:10], start=1)
         }
+        # The same notes field by field, with the teacher.
+        attrs["notes"] = [
+            {
+                "date": n.date,
+                "kind": n.kind,
+                "subject": n.subject or n.code,
+                "teacher": n.teacher,
+                "text": n.text,
+            }
+            for n in self.school.positives[:10]
+        ]
+        return attrs
 
 
 class RemarkSensor(Base):
