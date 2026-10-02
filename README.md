@@ -7,7 +7,7 @@ maintained separately. On top of 1.2.10 it adds message bodies, pinned messages,
 dated lesson notes and praise details. The
 [Wilma card](https://github.com/Tubbs10/ha-wilma-card) needs this fork.
 
-Current version: **1.2.11**.
+Current version: **1.2.12**.
 
 It logs in with a **guardian** username and password, keeps one browser-like
 session, and polls school pages. There is no Visma developer API key.
@@ -85,6 +85,7 @@ the child device.
 | Poissaolot | Absence notes |
 | Myöhästymiset | Late notes |
 | Kehut | Positive notes |
+| Moitteet | Remarks, e.g. homework not done |
 | Selvittämättömät tuntimerkinnät | Unresolved / *selvitettävä* notes |
 | Kaikki tuntimerkinnät | Full note list |
 | Viimeisin tuntimerkintä | Latest note |
@@ -118,8 +119,15 @@ polled in the background.
 in the `pinned` attribute of the **Uudet viestit** sensor with id, subject,
 sender and timestamp, so every user of a dashboard sees the same pins.
 
-The **Kehut** sensor has a `notes` attribute with `date`, `kind`, `subject`,
-`teacher` and `text` of each positive note.
+## Praise and remarks
+
+Every school names its own lesson note types, so **Kehut** and **Moitteet**
+are picked by words in the type name (`Positiivinen asenne`,
+`Kotitehtävät tekemättä`). The teacher's free text is read only when the type
+name says nothing. A note that is neither stays in **Kaikki tuntimerkinnät**.
+
+Both sensors have a `notes` attribute with `date`, `kind`, `subject`,
+`teacher` and `text` of each note.
 
 ## Homework rules (1.2.6–1.2.7)
 
@@ -216,6 +224,7 @@ Works on Container/Docker HA. No Supervisor add-on store required.
 
 | Version | Notes |
 |---|---|
+| 1.2.12 | Kehut and Moitteet recognise more note types and go by the type name before the free text; `notes` attribute on Moitteet; doctor's visits count as absences |
 | 1.2.11 | Fork. `wilma.get_message`, `wilma.pin_message` / `wilma.unpin_message`, `messages` and `pinned` attributes, lesson notes read from the attendance table rows (dated notes, by Mihail Tommonen), `notes` attribute on Kehut |
 | 1.2.10 | Moitteet sensor |
 | 1.2.7 | Homework due = next subject lesson **after** the assigned date |

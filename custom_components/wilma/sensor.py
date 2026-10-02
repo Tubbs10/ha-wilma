@@ -344,6 +344,7 @@ class RemarkSensor(Base):
     _attr_icon = "mdi:thumb-down-outline"
     _attr_native_unit_of_measurement = "kpl"
     _attr_state_class = SensorStateClass.MEASUREMENT
+    _unrecorded_attributes = frozenset({"notes"})
 
     def __init__(self, coordinator, entry, child_id=None, child_name=None):
         super().__init__(coordinator, entry, "remarks", child_id, child_name)
@@ -356,10 +357,21 @@ class RemarkSensor(Base):
     def extra_state_attributes(self) -> dict:
         if not self.school:
             return {}
-        return {
+        attrs: dict = {
             f"item_{i}": _join(n.date, n.time, n.kind, n.subject, n.teacher, n.text)
             for i, n in enumerate(self.school.remarks[:15], start=1)
         }
+        attrs["notes"] = [
+            {
+                "date": n.date,
+                "kind": n.kind,
+                "subject": n.subject or n.code,
+                "teacher": n.teacher,
+                "text": n.text,
+            }
+            for n in self.school.remarks[:15]
+        ]
+        return attrs
 
 
 class LatestNoteSensor(Base):
