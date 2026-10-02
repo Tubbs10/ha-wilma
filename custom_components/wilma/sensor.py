@@ -625,6 +625,8 @@ class ChildUnreadSensor(Base):
     _attr_icon = "mdi:email-alert"
     _attr_native_unit_of_measurement = "kpl"
     _attr_state_class = SensorStateClass.MEASUREMENT
+    # The list is for dashboards; the recorder keeps msg_1…msg_10.
+    _unrecorded_attributes = frozenset({"messages", "pinned"})
 
     def __init__(self, coordinator, entry, child_id=None, child_name=None):
         super().__init__(coordinator, entry, "child_unread", child_id, child_name)
@@ -653,4 +655,17 @@ class ChildUnreadSensor(Base):
         for i, msg in enumerate(cm.messages[:10], start=1):
             flag = "● " if msg.unread else ""
             attrs[f"msg_{i}"] = f"{flag}{_join(msg.timestamp, msg.subject, msg.sender)}"
+        # With ids, so that a message can be fetched with wilma.get_message.
+        attrs["messages"] = [
+            {
+                "id": msg.id,
+                "timestamp": msg.timestamp,
+                "subject": msg.subject,
+                "sender": msg.sender,
+                "unread": msg.unread,
+            }
+            for msg in cm.messages
+        ]
+        # Pinned with wilma.pin_message; shared by every user of the dashboard.
+        attrs["pinned"] = self.coordinator.pinned(self._child_id)
         return attrs
