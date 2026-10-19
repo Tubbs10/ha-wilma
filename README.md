@@ -36,7 +36,7 @@ Account: Lukemattomat, Viestit, Viimeisin viesti (`msg_1`… is date · subject 
 
 Per child: Oppilas (`probes`, `overview_keys`), Tänään, Seuraava tunti, Kalenteri, Aktiiviset / Menneet / Kaikki läksyt, Seuraava koe, Arvosanat, Tiedote, Kurssit, Uudet viestit, Poissaolot, Myöhästymiset, Kehut, Moitteet, Selvittämättömät tuntimerkinnät, Kaikki tuntimerkinnät, Viimeisin tuntimerkintä.
 
-`Uudet viestit` has `messages` (ids) and `pinned`. Kehut and Moitteet have `notes` as `{date, kind, subject, teacher, text}`. `Seuraava tunti` attributes `lesson_*` stay weekly slots; `schedule` has the dates of each slot. A fetched week shows in probes as `schedule?date=05.10.2026 200 lessons=21`.
+`Uudet viestit` has `messages` (ids) and `pinned`. Kehut and Moitteet have `notes` as `{date, kind, subject, teacher, text}`. `Seuraava tunti` attributes `lesson_*` stay weekly slots; `schedule` has the lessons of fetched weeks with their date, and the weekly slots with the dates left outside those weeks. A fetched week shows in probes as `schedule?date=05.10.2026 200 lessons=21`.
 
 `403` on exams / groups / choices is often a permission miss. A dead session is `LOGIN_COLLISION`, overview `401`/`403`, or overview `200 text/html`.
 
