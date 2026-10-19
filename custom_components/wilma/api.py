@@ -238,10 +238,14 @@ def _walk_lessons(obj: Any, acc: list[Lesson], depth: int = 0) -> None:
                 day = int(obj.get("Day") or obj.get("day") or obj.get("WeekDay") or 0)
             except (TypeError, ValueError):
                 day = 0
+            # A weekly slot's "Day" is the weekday number, not a date: keep only a real date.
+            date_s = _first_date(obj)
+            if not parse_date(date_s):
+                date_s = ""
             acc.append(
                 Lesson(
                     day=day,
-                    date=_first_date(obj),
+                    date=date_s,
                     start=start,
                     end=end,
                     subject=subject,
