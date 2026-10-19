@@ -987,18 +987,16 @@ def schedule_attribute(schedule: list[Lesson], covered_weeks: list[str] | None =
     """Lessons with the dates they are held on, for dashboards.
 
     A fetched week has dated lessons and its dates are stripped from the weekly
-    slots, so both go in. A weekly slot left without dates would match every
+    slots, so both go in. A lesson left without a valid date would match every
     weekday on a dashboard, fetched weeks included, so it stays out once weeks
     have been fetched.
     """
     out = []
     for lesson in schedule:
-        if lesson.date:
-            dates = [lesson.date]
-        else:
-            dates = lesson.dates
-            if covered_weeks and not dates:
-                continue
+        raw = [lesson.date] if lesson.date else lesson.dates
+        dates = sorted({d.isoformat() for d in map(parse_date, raw) if d})
+        if covered_weeks and not dates:
+            continue
         out.append(
             {
                 "day": lesson.day,
@@ -1007,7 +1005,7 @@ def schedule_attribute(schedule: list[Lesson], covered_weeks: list[str] | None =
                 "subject": lesson.subject,
                 "teacher": lesson.teacher,
                 "room": lesson.room,
-                "dates": sorted({d.isoformat() for d in map(parse_date, dates) if d}),
+                "dates": dates,
             }
         )
     out.sort(key=lambda item: (item["dates"][:1], item["day"] or 99, item["start"] or "", item["subject"] or ""))
